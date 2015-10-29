@@ -13,3 +13,9 @@ simplesamlphp_auth.saml_login:
     _controller: '\Drupal\simplesamlphp_auth\Controller\SimplesamlphpAuthController::authenticate'
   requirements:
     _access: 'TRUE'
+simplesamlphp_auth.saml_slo:
+  path: '/simplesamlphp_auth/logout'
+  defaults:
+    _controller: '\Drupal\simplesamlphp_auth\Controller\SimplesamlphpAuthController::doSingleLogOut'
+  requirements:
+    _user_is_logged_in: 'TRUE'

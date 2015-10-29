@@ -10,3 +10,7 @@ services:
   logger.channel.simplesamlphp_auth:
     parent: logger.channel_base
     arguments: ['simplesamlphp_auth']
+  saml_idp.route_subscriber:
+    class: 'Drupal\simplesamlphp_auth\EventSubscriber\RouteSubscriber'
+    tags:
+      - { name: event_subscriber }

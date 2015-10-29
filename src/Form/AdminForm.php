@@ -147,6 +147,12 @@ class AdminForm extends ConfigFormBase {
       '#default_value' => $config->get('allow.default_login_users'),
       '#description' => $this->t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp. If left blank, all local accounts can login.'),
     );
+    $form['authentication']['allow_slo'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable Single Log Out'),
+      '#default_value' => $config->get('allow.slo'),
+      '#description' => $this->t('Enable Single Log Out.'),
+    );
     $form['authentication']['logout_goto_url'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Redirect users after logging out'),
@@ -161,6 +167,7 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $old_slo = $this->configFactory()->get('simplesamlphp_auth.settings')->get('allow.slo');
     $this->configFactory()->getEditable('simplesamlphp_auth.settings')
       ->set('activate', $form_state->getValue('activate'))
       ->set('auth_source', $form_state->getValue('auth_source'))
@@ -175,8 +182,13 @@ class AdminForm extends ConfigFormBase {
       ->set('allow.default_login', $form_state->getValue('allow_default_login'))
       ->set('allow.default_login_roles', $form_state->getValue('allow_default_login_roles'))
       ->set('allow.default_login_users', $form_state->getValue('allow_default_login_users'))
+      ->set('allow.slo', $form_state->getValue('allow_slo'))
       ->set('logout_goto_url', $form_state->getValue('logout_goto_url'))
       ->save();
+
+    if ($old_slo != $form_state->getValue('allow_slo')) {
+      \Drupal::service('router.builder')->rebuild();
+    }
 
     parent::submitForm($form, $form_state);
 

@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Url;
 
 
 /**
@@ -175,6 +176,28 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
 
     return $this->redirect('user.login');
 
+  }
+
+  /**
+   * Does a Single Log Out.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   */
+  public function doSingleLogOut() {
+    $config = $this->config('simplesamlphp_auth.settings');
+    $goto = $config->get('logout_goto_url') ?: Url::fromRoute('<front>', array(), ['absolute' => TRUE]);
+    if (!$this->simplesaml->isAuthenticated()) {
+      // Log out same as \Drupal\user\Controller\UserController::logout(), with optional redirect.
+      user_logout();
+      return $this->redirect($goto);
+    }
+    $serviceUrl = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler()->getGenerated('SingleLogoutService');
+    $returnTo = $goto;
+    $url = Url::fromUri($serviceUrl, ['query' => ['ReturnTo' => $returnTo]])
+      ->toUriString();
+
+    user_logout();
+    return new RedirectResponse($url);
   }
 
 }
