@@ -70,7 +70,7 @@ class SimplesamlphpAuthManager {
   static function getAuthMapEntry($uid) {
     return \Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
       ->fields('sa', array('authname'))
-      ->condition('sa.uid', $account->id())
+      ->condition('sa.uid', $uid)
       ->execute()
       ->fetchField();
   }
