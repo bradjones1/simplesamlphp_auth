@@ -185,7 +185,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
    */
   public function doSingleLogOut() {
     $config = $this->config('simplesamlphp_auth.settings');
-    $goto = $config->get('logout_goto_url') ?: Url::fromRoute('<front>', array(), ['absolute' => TRUE]);
+    $goto = $config->get('logout_goto_url') ?: 'user.login';
     if (!$this->simplesaml->isAuthenticated()) {
       // Log out same as \Drupal\user\Controller\UserController::logout(), with optional redirect.
       user_logout();

@@ -67,6 +67,14 @@ class SimplesamlphpAuthManager {
     $this->entityManager = $entityManager;
   }
 
+  static function getAuthMapEntry($uid) {
+    return \Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
+      ->fields('sa', array('authname'))
+      ->condition('sa.uid', $account->id())
+      ->execute()
+      ->fetchField();
+  }
+
   /**
    * Loads the SimpleSAML instance and configuration.
    *

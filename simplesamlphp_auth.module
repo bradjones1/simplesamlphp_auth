@@ -30,6 +30,7 @@
 
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\simplesamlphp_auth\SimplesamlphpAuthManager;
 
 /**
  * Implements hook_help().
@@ -57,7 +58,7 @@ function simplesamlphp_auth_user_login($account) {
   }
 
   // If user registration has a valid session...
-  if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == $account->getInitialEmail()) {
+  if ($simplesaml->isAuthenticated()) {
     // Get name and mail from default attributes.
     try {
       $name = $simplesaml->getDefaultName();
@@ -67,12 +68,15 @@ function simplesamlphp_auth_user_login($account) {
       \Drupal::logger('simplesamlphp_auth')->critical($e->getMessage());
     }
 
-    // Update username and email address.
+    // @todo - Update username and email address.
     // @TODO Make this conditional.
     // Should this go in the Manager (externalLogin method)
-    $account->setUsername($name);
-    $account->setEmail($mail);
-    $account->save();
+    /**
+     * Original code:
+     * $account->setUsername($name);
+     * $account->setEmail($mail);
+     * $account->save()
+     */
 
   }
 }
@@ -130,10 +134,7 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
   // e-mail address, and set a Drupal password if they want to (and are allowed).
   $account = $form_state->getFormObject()->getEntity();
 
-  $saml_enabled = Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
-    ->fields('sa', array('authname'))
-    ->condition('sa.authname', $account->getInitialEmail())
-    ->fetchField();
+  $saml_enabled = SimplesamlphpAuthManager::getAuthMapEntry(\Drupal::currentUser()->id());
 
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
@@ -144,7 +145,7 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
     // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
     $config = \Drupal::config('simplesamlphp_auth.settings');
     if (!$config->get('allow.set_drupal_pwd')) {
-      unset($form['account']['pass']);
+      $form['account']['pass']['#access'] = FALSE;
     }
   }
 }
@@ -176,6 +177,7 @@ function simplesamlphp_auth_user_form_includes(&$form) {
   $form['simplesamlphp_auth_user_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
+    '#access' => \Drupal::currentUser()->hasPermission('administer simpleSAMLphp authentication'),
   );
 
   // We store the authname as the initial email. If we're using SimpleSAML we

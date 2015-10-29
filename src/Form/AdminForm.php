@@ -157,7 +157,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Redirect users after logging out'),
       '#default_value' => $config->get('logout_goto_url'),
-      '#description' => $this->t('Optionally, specify a URL for users to go to after logging out.'),
+      '#description' => $this->t('Optionally, specify a Drupal route for users to go to after logging out.'),
     );
 
     return $form;

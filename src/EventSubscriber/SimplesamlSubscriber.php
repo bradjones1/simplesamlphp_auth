@@ -41,6 +41,9 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   /**
    * Logs out user if not SAML authenticated and local logins are disabled.
    *
+   * @todo - Add check where user is in authmap, not otherwise authorized and not
+   *  currently logged in to the SP. SimplesamlphpAuthManager::getAuthMapEntry(\Drupal::currentUser()->id());
+   *
    * @param GetResponseEvent $event
    */
   public function checkAuthStatus(GetResponseEvent $event) {
