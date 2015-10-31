@@ -46,7 +46,7 @@ simplesamlphp_auth.settings:
           type: boolean
           label: 'Allow authentication with local Drupal accounts'
         default_login_roles:
-          type: mapping
+          type: sequence
           label: 'Roles to be allowed to log in locally'
         default_login_users:
           type: string
