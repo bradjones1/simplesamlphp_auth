@@ -9,9 +9,15 @@ use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use SimpleSAML_Auth_Simple;
 use SimpleSAML_Configuration;
+use Drupal\Core\Entity\Query\QueryFactory;
 
 
 class SimplesamlphpAuthManager {
+
+  /**
+   * The QueryFactory service.
+   */
+  protected $queryFactory;
 
   /**
    * The connection object used for this data.
@@ -60,11 +66,12 @@ class SimplesamlphpAuthManager {
    * @param Connection $connection
    * @param LoggerInterface $logger
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Connection $connection, EntityManagerInterface $entityManager, LoggerInterface $logger) {
+  public function __construct(ConfigFactoryInterface $config_factory, Connection $connection, EntityManagerInterface $entityManager, LoggerInterface $logger, QueryFactory $queryFactory) {
     $this->connection = $connection;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     $this->logger = $logger;
     $this->entityManager = $entityManager;
+    $this->queryFactory = $queryFactory;
   }
 
   static function getAuthMapEntry($uid) {
