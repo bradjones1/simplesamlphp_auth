@@ -191,7 +191,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
       user_logout();
       return $this->redirect($goto);
     }
-    $serviceUrl = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler()->getGenerated('SingleLogoutService');
+    $serviceUrl = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler()->getGenerated('SingleLogoutService', 'saml20-idp-hosted');
     $returnTo = $goto;
     $url = Url::fromUri($serviceUrl, ['query' => ['ReturnTo' => $returnTo]])
       ->toUriString();
